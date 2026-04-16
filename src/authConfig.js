@@ -1,3 +1,6 @@
+// debug line
+console.log("REDIRECT URI:", import.meta.env.VITE_REDIRECT_URI);
+
 export const authConfig = {
   clientId: "fitness-app",
 
@@ -11,7 +14,6 @@ export const authConfig = {
 
   scope: "openid profile email",
 
-  //  REQUIRED for Keycloak
   extraAuthParameters: {
     response_type: "code",
   },
