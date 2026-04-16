@@ -1,6 +1,3 @@
-// debug line
-console.log("REDIRECT URI:", import.meta.env.VITE_REDIRECT_URI);
-
 export const authConfig = {
   clientId: "fitness-app",
 
@@ -10,7 +7,7 @@ export const authConfig = {
   tokenEndpoint:
     "https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/token",
 
-  redirectUri: import.meta.env.VITE_REDIRECT_URI,
+  redirectUri: "https://fitness-frontend-6ogz.onrender.com/",  // ← hardcoded
 
   scope: "openid profile email",
 
