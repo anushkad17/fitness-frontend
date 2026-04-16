@@ -107,10 +107,7 @@ function App() {
                 boxShadow: "0 10px 25px rgba(239,68,68,0.4)",
                 "&:hover": { transform: "scale(1.05)" },
               }}
-              onClick={(e) => {
-                e.preventDefault();
-                logIn();
-              }}
+              onClick={() => logIn()}
             >
               Get Started 
             </Button>

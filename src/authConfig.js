@@ -11,16 +11,10 @@ export const authConfig = {
 
   scope: "openid profile email",
 
-  
-  getAuthUrl: (codeChallenge) => {
-    return `${authConfig.authorizationEndpoint}?response_type=code` +
-      `&client_id=${authConfig.clientId}` +
-      `&redirect_uri=${encodeURIComponent(authConfig.redirectUri)}` +
-      `&scope=${encodeURIComponent(authConfig.scope)}` +
-      `&code_challenge=${codeChallenge}` +
-      `&code_challenge_method=S256`;
+  //  REQUIRED for Keycloak
+  extraAuthParameters: {
+    response_type: "code",
   },
 
-  
   onRefreshTokenExpire: (event) => event.logIn(),
 };
