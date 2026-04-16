@@ -1,8 +1,8 @@
 export const authConfig = {
-   clientId: "oauth2-pkce-client",
-  authorizationEndpoint: "/realms/fitness-oauth2/protocol/openid-connect/auth",
-  tokenEndpoint: "/realms/fitness-oauth2/protocol/openid-connect/token",
-  redirectUri: "http://localhost:5179",
+  clientId: "fitness-app",
+  authorizationEndpoint: "https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/auth",
+  tokenEndpoint: "https://keycloak-deploy-st9e.onrender.com/realms/fitness-oauth2/protocol/openid-connect/token",
+  redirectUri: import.meta.env.VITE_REDIRECT_URI,   
   scope: "openid profile email",
-    onRefreshTokenExpire: (event) => event.logIn(),
-  }
+  onRefreshTokenExpire: (event) => event.logIn(),
+}

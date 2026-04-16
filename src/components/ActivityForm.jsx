@@ -50,7 +50,7 @@ const ActivityForm = ({ onActivityAdded }) => {
         additionalMetrics: {}, 
       };
 
-      console.log("Sending payload:", payload);
+      
 
       
       await addActivity(payload);

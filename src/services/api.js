@@ -1,28 +1,55 @@
 import axios from "axios";
 
-const API_URL = 'http://localhost:8080/api';
+// ✅ Base URL from env
+const BASE_URL = import.meta.env.VITE_API_URL;
 
+// ❗ Safety check
+if (!BASE_URL) {
+  console.error(" VITE_API_URL is not defined");
+}
+
+// ✅ Ensure no trailing slash issues
 const api = axios.create({
-    baseURL: API_URL
+  baseURL: `${BASE_URL}/api`,
 });
 
+// ✅ Attach token
 api.interceptors.request.use((config) => {
-    const userId = localStorage.getItem('userId');
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
-    if (token) {
-        config.headers['Authorization'] = `Bearer ${token}`;
-    }
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
 
-    if (userId) {
-        config.headers['X-User-ID'] = userId;
-    }
-    return config;
+  return config;
 });
 
-export const getActivities = () => api.get('/activities');
-export const addActivity = (activity) => api.post('/activities', activity);
-export const getActivityDetail = (id) => api.get(`/recommendations/activity/${id}`);
+// ✅ Global error logging
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error(
+      "API ERROR:",
+      error?.response?.status,
+      error?.response?.data || error.message
+    );
+    return Promise.reject(error);
+  }
+);
 
-// ✅ FIXED
-export const getActivityById = (id) => api.get(`/activities/${id}`);
+// ================= APIs =================
+
+export const getActivities = () => api.get("/activities");
+
+export const addActivity = (activity) =>
+  api.post("/activities", activity);
+
+export const getActivityDetail = (id) =>
+  api.get(`/recommendations/activity/${id}`);
+
+export const getActivityById = (id) =>
+  api.get(`/activities/${id}`);
+
+// =======================================
+
+export default api;

@@ -28,7 +28,7 @@ const ActivityDetail = () => {
 
       setRecommendation(data);
 
-      console.log("API RESPONSE:", data);
+      
 
       // STOP ONLY when REAL recommendation comes
       if (

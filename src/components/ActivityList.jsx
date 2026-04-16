@@ -17,7 +17,6 @@ import {
   Bar,
 } from "recharts";
 
-
 const getIcon = (type) => {
   switch (type?.toLowerCase()) {
     case "running": return "🏃";
@@ -26,7 +25,6 @@ const getIcon = (type) => {
     default: return "🔥";
   }
 };
-
 
 const sampleData = [
   { value: 10 },
@@ -48,7 +46,8 @@ const StatCard = ({ type, title, value }) => {
       sx={{
         p: 3,
         borderRadius: 4,
-        display: { xs: "block", md: "flex" },
+        display: "flex",
+        flexDirection: { xs: "column", md: "row" }, // ✅ FIXED
         alignItems: "center",
         justifyContent: "space-between",
         background: "rgba(255,255,255,0.05)",
@@ -57,7 +56,6 @@ const StatCard = ({ type, title, value }) => {
         color: "#fff",
       }}
     >
-      {/* LEFT */}
       <Box display="flex" alignItems="center" gap={2}>
         <Box
           sx={{
@@ -85,10 +83,8 @@ const StatCard = ({ type, title, value }) => {
         </Box>
       </Box>
 
-      {/* RIGHT VISUAL */}
-      <Box sx={{ width: 120, height: 50 }}>
-
-        {/* LINE CHART */}
+      {/* ✅ FIXED chart container */}
+      <Box sx={{ width: 120, height: 100 }}>
         {isCalories && (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={sampleData}>
@@ -103,7 +99,6 @@ const StatCard = ({ type, title, value }) => {
           </ResponsiveContainer>
         )}
 
-        {/* CIRCLE */}
         {isDuration && (
           <Box
             sx={{
@@ -117,7 +112,6 @@ const StatCard = ({ type, title, value }) => {
           />
         )}
 
-        {/* BAR CHART */}
         {isSessions && (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={sampleData}>
@@ -139,7 +133,7 @@ const ActivityList = () => {
       const res = await getActivities();
       setActivities(res.data);
     } catch (err) {
-      console.error(err);
+      console.error("FETCH ERROR:", err);
     }
   };
 
@@ -164,8 +158,6 @@ const ActivityList = () => {
 
   return (
     <Box>
-
-      {/*  TOP STATS */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} md={4}>
           <StatCard
@@ -192,95 +184,35 @@ const ActivityList = () => {
         </Grid>
       </Grid>
 
-      {/*  MAIN LAYOUT */}
-      <Box
-        sx={{
-          display: "flex",
-          gap: 3,
-          height: "calc(100vh - 220px)",
-          width: "100%",
-          overflow: "hidden",
-        }}
-      >
+      <Box sx={{ display: "flex", gap: 3 }}>
+        <Box sx={{ width: 300 }}>
+          <ActivityForm onActivityAdded={fetchActivities} />
+        </Box>
 
-        {/*  LEFT FORM */}
-<Box
-  sx={{
-    width: { xs: "100%", md: "300px" },      
-    minWidth: { xs: "100%", md: "300px" },   
-    flexShrink: 0,
-    position: { xs: "relative", md: "sticky" }, 
-    top: 0,
-    height: "fit-content",
-  }}
->
-  <ActivityForm onActivityAdded={fetchActivities} />
-</Box>
-
-        {/* RIGHT LIST */}
-        <Box
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            overflowY: "auto",
-            overflowX: "hidden",
-            pr: 1,
-            "&::-webkit-scrollbar": { display: "none" },
-    msOverflowStyle: "none",
-    scrollbarWidth: "none",
-          }}
-        >
-
-          {/*  ACTIVITY GRID */}
+        <Box sx={{ flex: 1, overflowY: "auto" }}>
           <Grid container spacing={3}>
-            {activities.map((a) => {
-              console.log(JSON.stringify(a, null, 2)); 
-
-              return (
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  md={4}
-                  lg={3}
-                  xl={2}
-                  key={a.id}
+            {activities.map((a) => (
+              <Grid item xs={12} sm={6} md={4} key={a.id}>
+                <Card
+                  sx={{
+                    p: 2,
+                    borderRadius: 4,
+                    background: "rgba(255,255,255,0.05)",
+                    color: "#fff",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => navigate(`/activities/${a.id}`)}
                 >
-                  <Card
-                    sx={{
-                      p: 2,
-                      borderRadius: 4,
-                      background: "rgba(255,255,255,0.05)",
-                      backdropFilter: "blur(14px)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      color: "#fff",
-                      cursor: "pointer",
-                      transition: "0.3s",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                        boxShadow: "0 20px 40px rgba(0,0,0,0.5)",
-                      },
-                    }}
-                    onClick={() => navigate(`/activities/${a.id}`)}
-                  >
-                    <Typography fontWeight="bold" sx={{ mb: 1 }}>
-                      {getIcon(a.type)} {a.type?.toUpperCase()}
-                    </Typography>
+                  <Typography fontWeight="bold">
+                    {getIcon(a.type)} {a.type?.toUpperCase()}
+                  </Typography>
 
-                    <Typography>⏱ {a.duration} min</Typography>
-                    <Typography>🔥 {a.caloriesBurned} kcal</Typography>
-
-                    <Typography sx={{ opacity: 0.6, mt: 1, fontSize: 12 }}>
-                      {a.createdAt
-                        ? new Date(a.createdAt).toLocaleString()
-                        : ""}
-                    </Typography>
-                  </Card>
-                </Grid>
-              );
-            })}
+                  <Typography>⏱ {a.duration} min</Typography>
+                  <Typography>🔥 {a.caloriesBurned} kcal</Typography>
+                </Card>
+              </Grid>
+            ))}
           </Grid>
-
         </Box>
       </Box>
     </Box>
