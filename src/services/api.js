@@ -1,14 +1,13 @@
 import axios from "axios";
 
-// ✅ Base URL from env
-const BASE_URL = import.meta.env.VITE_API_URL;
 
-// ❗ Safety check
-if (!BASE_URL) {
-  console.error(" VITE_API_URL is not defined");
+const BASE_URL =
+  import.meta.env.VITE_API_URL || "https://api-gateway-1xvp.onrender.com";
+
+if (!import.meta.env.VITE_API_URL) {
+  console.warn("Using fallback API URL");
 }
 
-// ✅ Ensure no trailing slash issues
 const api = axios.create({
   baseURL: `${BASE_URL}/api`,
 });

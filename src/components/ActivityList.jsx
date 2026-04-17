@@ -4,6 +4,7 @@ import {
   Box,
   Grid
 } from "@mui/material";
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getActivities } from "../services/api";
@@ -19,10 +20,14 @@ import {
 
 const getIcon = (type) => {
   switch (type?.toLowerCase()) {
-    case "running": return "🏃";
-    case "walking": return "🚶";
-    case "cycling": return "🚴";
-    default: return "🔥";
+    case "running":
+      return "🏃";
+    case "walking":
+      return "🚶";
+    case "cycling":
+      return "🚴";
+    default:
+      return "🔥";
   }
 };
 
@@ -47,7 +52,7 @@ const StatCard = ({ type, title, value }) => {
         p: 3,
         borderRadius: 4,
         display: "flex",
-        flexDirection: { xs: "column", md: "row" }, // ✅ FIXED
+        flexDirection: { xs: "column", md: "row" },
         alignItems: "center",
         justifyContent: "space-between",
         background: "rgba(255,255,255,0.05)",
@@ -83,7 +88,6 @@ const StatCard = ({ type, title, value }) => {
         </Box>
       </Box>
 
-      {/* ✅ FIXED chart container */}
       <Box sx={{ width: 120, height: 100 }}>
         {isCalories && (
           <ResponsiveContainer width="100%" height="100%">
@@ -115,7 +119,11 @@ const StatCard = ({ type, title, value }) => {
         {isSessions && (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={sampleData}>
-              <Bar dataKey="value" fill="#9ca3af" radius={[2, 2, 0, 0]} />
+              <Bar
+                dataKey="value"
+                fill="#9ca3af"
+                radius={[2, 2, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -131,9 +139,24 @@ const ActivityList = () => {
   const fetchActivities = async () => {
     try {
       const res = await getActivities();
-      setActivities(res.data);
+
+      console.log("API RESPONSE:", res.data);
+
+      // SAFE EXTRACTION
+      let data = [];
+
+      if (Array.isArray(res.data)) {
+        data = res.data;
+      } else if (Array.isArray(res.data?.content)) {
+        data = res.data.content;
+      } else if (Array.isArray(res.data?.data)) {
+        data = res.data.data;
+      }
+
+      setActivities(data);
     } catch (err) {
       console.error("FETCH ERROR:", err);
+      setActivities([]);
     }
   };
 
@@ -141,20 +164,24 @@ const ActivityList = () => {
     fetchActivities();
   }, []);
 
-  const totalCalories = activities.reduce(
-    (sum, a) => sum + (a.caloriesBurned || 0),
+  const safeActivities = Array.isArray(activities) ? activities : [];
+
+  const totalCalories = safeActivities.reduce(
+    (sum, a) => sum + (a?.caloriesBurned || 0),
     0
   );
 
   const avgDuration =
-    activities.length > 0
+    safeActivities.length > 0
       ? Math.round(
-          activities.reduce((sum, a) => sum + a.duration, 0) /
-            activities.length
+          safeActivities.reduce(
+            (sum, a) => sum + (a?.duration || 0),
+            0
+          ) / safeActivities.length
         )
       : 0;
 
-  const totalActivities = activities.length;
+  const totalActivities = safeActivities.length;
 
   return (
     <Box>
@@ -191,7 +218,7 @@ const ActivityList = () => {
 
         <Box sx={{ flex: 1, overflowY: "auto" }}>
           <Grid container spacing={3}>
-            {activities.map((a) => (
+            {safeActivities.map((a) => (
               <Grid item xs={12} sm={6} md={4} key={a.id}>
                 <Card
                   sx={{
