@@ -6,15 +6,21 @@ import {
   MenuItem
 } from "@mui/material";
 import { useState } from "react";
+import { useSelector } from "react-redux"; // ✅ Added for Redux access
 import { addActivity } from "../services/api";
 
 const ActivityForm = ({ onActivityAdded }) => {
+  // ✅ Get the userId from your Redux auth state
+  const { userId } = useSelector((state) => state.auth);
+
   const [type, setType] = useState("Running");
   const [customType, setCustomType] = useState("");
   const [duration, setDuration] = useState("");
   const [caloriesBurned, setCaloriesBurned] = useState("");
+
   const formatDate = () => {
     const d = new Date();
+    // Returns "YYYY-MM-DDTHH:mm:ss" format
     return d.toISOString().slice(0, 19);
   };
 
@@ -26,7 +32,7 @@ const ActivityForm = ({ onActivityAdded }) => {
         ? customType.toUpperCase()
         : type.toUpperCase();
 
-    
+    // Validation
     if (
       !finalType?.trim() ||
       !duration ||
@@ -40,33 +46,39 @@ const ActivityForm = ({ onActivityAdded }) => {
       return;
     }
 
+    // Safety check for userId
+    if (!userId) {
+      alert("User session expired. Please log in again.");
+      return;
+    }
+
     try {
-     
+      // ✅ Payload now includes the userId string and matches backend expectations
       const payload = {
+        userId: userId, // Pass the sub/id string
         type: finalType,
         duration: parseInt(duration),
         caloriesBurned: parseInt(caloriesBurned),
         startTime: formatDate(),
+        // If your Java backend uses a String for this field, change {} to ""
         additionalMetrics: {}, 
       };
 
-      
-
-      
       await addActivity(payload);
 
-      
+      // Reset form
       setType("Running");
       setCustomType("");
       setDuration("");
       setCaloriesBurned("");
 
-      
+      // Refresh list
       onActivityAdded();
 
     } catch (error) {
-      console.error("ERROR:", error.response?.data || error.message);
-      alert("Failed to add activity");
+      // This will log the specific field that failed validation from the backend
+      console.error("ERROR DETAILS:", error.response?.data || error.message);
+      alert("Failed to add activity. Check console for details.");
     }
   };
 
@@ -87,7 +99,6 @@ const ActivityForm = ({ onActivityAdded }) => {
       </Typography>
 
       <form onSubmit={handleSubmit}>
-
         {/* ACTIVITY TYPE */}
         <TextField
           select
@@ -154,12 +165,10 @@ const ActivityForm = ({ onActivityAdded }) => {
         >
           ADD ACTIVITY 
         </Button>
-
       </form>
     </Box>
   );
 };
-
 
 const inputStyle = {
   mb: 2,
