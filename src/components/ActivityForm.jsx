@@ -61,7 +61,7 @@ const ActivityForm = ({ onActivityAdded }) => {
         caloriesBurned: parseInt(caloriesBurned),
         startTime: formatDate(),
         // If your Java backend uses a String for this field, change {} to ""
-        additionalMetrics: {}, 
+        additionalMetrics: "", 
       };
 
       await addActivity(payload);
